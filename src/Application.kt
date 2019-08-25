@@ -2,7 +2,6 @@ package com.example.ktorOauthPractice
 
 import io.ktor.application.*
 import io.ktor.response.*
-import io.ktor.request.*
 import io.ktor.features.*
 import io.ktor.routing.*
 import io.ktor.http.*
@@ -11,14 +10,33 @@ import com.fasterxml.jackson.databind.*
 import io.ktor.jackson.*
 import io.ktor.client.*
 import io.ktor.client.engine.jetty.*
+import io.ktor.server.engine.embeddedServer
+import io.ktor.server.netty.Netty
+import com.example.ktorOauthPractice.auth.*
 
-fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
+
+fun main(args: Array<String>): Unit  {
+    io.ktor.server.netty.EngineMain.main(args)
+    embeddedServer(Netty, 8080) {
+        routing {
+            get("/") {
+                call.authentication
+            }
+        }
+    }
+    //comeback and make into an embed Server afeter configuring the environments
+
+
 
 @Suppress("unused") // Referenced in application.conf
-@kotlin.jvm.JvmOverloads
 fun Application.module(testing: Boolean = false) {
     install(AutoHeadResponse)
 
+    install (Authentication) {
+        oauth("IdentityServer4") {
+            
+        }
+    }
     install(ConditionalHeaders)
 
     install(CORS) {
@@ -58,4 +76,4 @@ fun Application.module(testing: Boolean = false) {
         }
     }
 }
-
+}
